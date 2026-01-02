@@ -15,30 +15,21 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             List {
-                HStack {
+                HStack(spacing: 8) {
                     Text("Habitualist")
-                        .font(.system(size: 34, weight: .heavy, design: .rounded))
+                        .font(.system(size: 24, weight: .heavy, design: .rounded))
                         .foregroundColor(.purple)
                     
                     Spacer()
                     
-                    HStack(spacing: 12) {
-                        Button {
-                            showingAddHabit = true
-                        } label: {
-                            Text("Add new habits")
-                                .font(.body)
-                        }
-                        
-                        Button {
-                            showingSettings = true
-                        } label: {
-                            Image(systemName: "gearshape")
-                                .foregroundColor(.primary)
-                        }
+                    Button {
+                        showingAddHabit = true
+                    } label: {
+                        Text("Add new habits")
+                            .font(.body)
                     }
                 }
-                .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 16))
+                .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 0))
                 .listRowBackground(Color.clear)
                 
                 if !todayKey.isEmpty {
@@ -61,6 +52,15 @@ struct TodayView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
             }
