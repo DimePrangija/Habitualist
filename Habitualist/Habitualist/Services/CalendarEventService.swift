@@ -17,7 +17,19 @@ class CalendarEventService {
         case .authorized:
             return true
         case .notDetermined:
-            return await eventStore.requestAccess(to: .event)
+            if #available(iOS 17.0, *) {
+                return await withCheckedContinuation { continuation in
+                    eventStore.requestFullAccessToEvents { granted, error in
+                        continuation.resume(returning: granted)
+                    }
+                }
+            } else {
+                return await withCheckedContinuation { continuation in
+                    eventStore.requestAccess(to: .event) { granted, error in
+                        continuation.resume(returning: granted)
+                    }
+                }
+            }
         case .denied, .restricted:
             return false
         @unknown default:
@@ -66,10 +78,7 @@ class CalendarEventService {
             return existingCalendar
         }
         
-        guard let newCalendar = EKCalendar(for: .event, eventStore: eventStore) else {
-            throw CalendarEventError.calendarCreationFailed
-        }
-        
+        let newCalendar = EKCalendar(for: .event, eventStore: eventStore)
         newCalendar.title = "Habitualist"
         newCalendar.cgColor = UIColor.purple.cgColor
         
