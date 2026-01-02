@@ -9,27 +9,15 @@ struct TodayView: View {
     
     @State private var todayKey: String = ""
     @State private var showingAddHabit = false
-    @State private var showingSettings = false
     
     var body: some View {
         NavigationStack {
             List {
-                HStack {
-                    Text("Habitualist")
-                        .font(.system(size: 34, weight: .heavy, design: .rounded))
-                        .foregroundColor(.purple)
-                    
-                    Spacer()
-                    
-                    Button {
-                        showingSettings = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .foregroundColor(.primary)
-                    }
-                }
-                .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 16))
-                .listRowBackground(Color.clear)
+                Text("Habitualist")
+                    .font(.system(size: 34, weight: .heavy, design: .rounded))
+                    .foregroundColor(.purple)
+                    .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 16))
+                    .listRowBackground(Color.clear)
                 
                 if !todayKey.isEmpty {
                     Text(formatDateHeader())
@@ -54,9 +42,6 @@ struct TodayView: View {
             }
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
-            }
-            .sheet(isPresented: $showingSettings) {
-                SettingsView()
             }
             .onAppear {
                 todayKey = DayKeyService.todayKey()
@@ -86,12 +71,12 @@ struct HabitRowView: View {
     
     var body: some View {
         HStack(spacing: 16) {
+            HabitStatusIcon(isCompleted: isCompletedToday)
+            
             Text(habit.title)
                 .font(.system(.body, design: .default, weight: .semibold))
             
             Spacer()
-            
-            HabitStatusIcon(isCompleted: isCompletedToday)
         }
         .padding(.vertical, 16)
         .contentShape(Rectangle())
