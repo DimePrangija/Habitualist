@@ -8,6 +8,7 @@ struct EditHabitView: View {
     @Bindable var habit: Habit
     
     @State private var title: String = ""
+    @State private var targetDaysPerWeek: Int = 7
     @State private var isArchived: Bool = false
     
     var body: some View {
@@ -16,6 +17,10 @@ struct EditHabitView: View {
                 Section {
                     TextField("Habit title", text: $title)
                         .autocorrectionDisabled()
+                }
+                
+                Section {
+                    Stepper("Target: \(targetDaysPerWeek) days per week", value: $targetDaysPerWeek, in: 1...7)
                 }
                 
                 Section {
@@ -40,6 +45,7 @@ struct EditHabitView: View {
             }
             .onAppear {
                 title = habit.title
+                targetDaysPerWeek = habit.targetDaysPerWeek
                 isArchived = habit.isArchived
             }
         }
@@ -50,6 +56,7 @@ struct EditHabitView: View {
         guard !trimmedTitle.isEmpty else { return }
         
         habit.title = trimmedTitle
+        habit.targetDaysPerWeek = targetDaysPerWeek
         habit.isArchived = isArchived
         
         try? modelContext.save()

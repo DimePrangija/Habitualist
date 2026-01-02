@@ -6,6 +6,7 @@ struct AddHabitView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var title: String = ""
+    @State private var targetDaysPerWeek: Int = 7
     
     var body: some View {
         NavigationStack {
@@ -13,6 +14,10 @@ struct AddHabitView: View {
                 Section {
                     TextField("Habit title", text: $title)
                         .autocorrectionDisabled()
+                }
+                
+                Section {
+                    Stepper("Target: \(targetDaysPerWeek) days per week", value: $targetDaysPerWeek, in: 1...7)
                 }
             }
             .navigationTitle("New Habit")
@@ -38,7 +43,7 @@ struct AddHabitView: View {
         let trimmedTitle = title.trimmingCharacters(in: .whitespaces)
         guard !trimmedTitle.isEmpty else { return }
         
-        let habit = Habit(title: trimmedTitle)
+        let habit = Habit(title: trimmedTitle, targetDaysPerWeek: targetDaysPerWeek)
         modelContext.insert(habit)
         
         try? modelContext.save()
