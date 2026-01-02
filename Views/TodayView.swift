@@ -13,6 +13,12 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             List {
+                Text("Habitualist")
+                    .font(.system(size: 34, weight: .heavy, design: .rounded))
+                    .foregroundColor(.purple)
+                    .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 16))
+                    .listRowBackground(Color.clear)
+                
                 if !todayKey.isEmpty {
                     Text(formatDateHeader())
                         .font(.subheadline)
@@ -24,7 +30,7 @@ struct TodayView: View {
                     HabitRowView(habit: habit, todayKey: todayKey)
                 }
             }
-            .navigationTitle("Today")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -64,14 +70,15 @@ struct HabitRowView: View {
     }
     
     var body: some View {
-        HStack {
+        HStack(spacing: 16) {
+            HabitStatusIcon(isCompleted: isCompletedToday)
+            
             Text(habit.title)
-                .font(.body)
+                .font(.system(.body, design: .default, weight: .semibold))
             
             Spacer()
-            
-            HabitStatusIcon(isCompleted: isCompletedToday)
         }
+        .padding(.vertical, 16)
         .contentShape(Rectangle())
         .onTapGesture {
             toggleCompletion()
