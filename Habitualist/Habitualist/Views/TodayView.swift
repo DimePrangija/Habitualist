@@ -22,11 +22,20 @@ struct TodayView: View {
                     
                     Spacer()
                     
-                    Button {
-                        showingSettings = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .foregroundColor(.primary)
+                    HStack(spacing: 12) {
+                        Button {
+                            showingAddHabit = true
+                        } label: {
+                            Text("Add new habits")
+                                .font(.body)
+                        }
+                        
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                                .foregroundColor(.primary)
+                        }
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 16))
@@ -52,15 +61,6 @@ struct TodayView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showingAddHabit = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
             }

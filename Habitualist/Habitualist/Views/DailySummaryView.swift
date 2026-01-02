@@ -5,10 +5,16 @@ struct DailySummaryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     
+    @AppStorage("writeDailySummaryToCalendar") private var writeDailySummaryToCalendar: Bool = false
+    
     @Query(filter: #Predicate<Habit> { !$0.isArchived })
     private var habits: [Habit]
     
     @Query private var completions: [Completion]
+    
+    @State private var showingSaveAlert = false
+    @State private var saveAlertMessage = ""
+    @State private var isSaving = false
     
     private var todayKey: String {
         DayKeyService.todayKey()
@@ -27,6 +33,21 @@ struct DailySummaryView: View {
     private func weeklyProgress(_ habit: Habit) -> (completed: Int, target: Int) {
         let completed = WeeklyProgressService.completionsThisWeek(habitId: habit.id, for: Date(), in: modelContext)
         return (completed, habit.targetDaysPerWeek)
+    }
+    
+    private func generateSummaryNotes() -> String {
+        var notes = "Date: \(todayKey)\n"
+        notes += "Total Active Habits: \(habits.count)\n"
+        notes += "Completed Today: \(completedTodayCount)\n\n"
+        notes += "Habits:\n"
+        
+        for habit in habits {
+            let completed = isCompletedToday(habit)
+            let progress = weeklyProgress(habit)
+            notes += "- \(habit.title): \(completed ? "Completed today" : "Not completed today"), \(progress.completed)/\(progress.target) this week\n"
+        }
+        
+        return notes
     }
     
     var body: some View {
@@ -55,6 +76,26 @@ struct DailySummaryView: View {
                     }
                 } header: {
                     Text("Summary")
+                }
+                
+                if writeDailySummaryToCalendar {
+                    Section {
+                        Button {
+                            Task {
+                                await saveToCalendar()
+                            }
+                        } label: {
+                            HStack {
+                                if isSaving {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                }
+                                Text(isSaving ? "Saving..." : "Save to Calendar")
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .disabled(isSaving)
+                    }
                 }
                 
                 Section {
@@ -91,6 +132,38 @@ struct DailySummaryView: View {
                         dismiss()
                     }
                 }
+            }
+            .alert("Calendar", isPresented: $showingSaveAlert) {
+                Button("OK") {}
+            } message: {
+                Text(saveAlertMessage)
+            }
+        }
+    }
+    
+    private func saveToCalendar() async {
+        await MainActor.run {
+            isSaving = true
+        }
+        
+        do {
+            let notes = generateSummaryNotes()
+            try await CalendarEventService.shared.upsertDailySummaryEvent(
+                date: Date(),
+                title: "Habitualist Summary",
+                notes: notes
+            )
+            
+            await MainActor.run {
+                isSaving = false
+                saveAlertMessage = "Daily summary saved to Calendar successfully."
+                showingSaveAlert = true
+            }
+        } catch {
+            await MainActor.run {
+                isSaving = false
+                saveAlertMessage = error.localizedDescription
+                showingSaveAlert = true
             }
         }
     }
