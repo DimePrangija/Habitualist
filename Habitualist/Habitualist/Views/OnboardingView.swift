@@ -1,11 +1,18 @@
 import SwiftUI
 import SwiftData
 
+struct HabitInput: Identifiable {
+    let id = UUID()
+    var title: String
+    var targetDaysPerWeek: Int
+}
+
 struct OnboardingView: View {
     @Environment(\.modelContext) private var modelContext
     
-    @State private var habitTitles: [String] = []
+    @State private var habits: [HabitInput] = []
     @State private var currentTitle: String = ""
+    @State private var currentTarget: Int = 7
     
     var body: some View {
         NavigationStack {
@@ -17,10 +24,21 @@ struct OnboardingView: View {
                     .padding(.top, 40)
                 
                 VStack(spacing: 16) {
-                    HStack(spacing: 12) {
+                    VStack(spacing: 12) {
                         TextField("Habit title", text: $currentTitle)
                             .textFieldStyle(.roundedBorder)
                             .autocorrectionDisabled()
+                        
+                        HStack {
+                            Text("Target: \(currentTarget) days per week")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            Spacer()
+                            
+                            Stepper("", value: $currentTarget, in: 1...7)
+                                .labelsHidden()
+                        }
                         
                         Button("Add") {
                             addHabit()
@@ -29,18 +47,23 @@ struct OnboardingView: View {
                         .disabled(currentTitle.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
                     
-                    if !habitTitles.isEmpty {
+                    if !habits.isEmpty {
                         List {
-                            ForEach(Array(habitTitles.enumerated()), id: \.offset) { index, title in
+                            ForEach(habits) { habit in
                                 HStack {
-                                    Text(title)
-                                        .font(.body)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(habit.title)
+                                            .font(.body)
+                                        Text("\(habit.targetDaysPerWeek) days per week")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
                                     Spacer()
                                 }
                                 .contentShape(Rectangle())
                             }
                             .onDelete { indexSet in
-                                habitTitles.remove(atOffsets: indexSet)
+                                habits.remove(atOffsets: indexSet)
                             }
                         }
                         .frame(maxHeight: 300)
@@ -56,7 +79,7 @@ struct OnboardingView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-                .disabled(habitTitles.isEmpty)
+                .disabled(habits.isEmpty)
                 .padding(.horizontal)
                 .padding(.bottom, 40)
             }
@@ -67,15 +90,16 @@ struct OnboardingView: View {
         let trimmed = currentTitle.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         
-        habitTitles.append(trimmed)
+        habits.append(HabitInput(title: trimmed, targetDaysPerWeek: currentTarget))
         currentTitle = ""
+        currentTarget = 7
     }
     
     private func saveHabitsAndComplete() {
-        guard !habitTitles.isEmpty else { return }
+        guard !habits.isEmpty else { return }
         
-        for title in habitTitles {
-            let habit = Habit(title: title)
+        for habitInput in habits {
+            let habit = Habit(title: habitInput.title, targetDaysPerWeek: habitInput.targetDaysPerWeek)
             modelContext.insert(habit)
         }
         

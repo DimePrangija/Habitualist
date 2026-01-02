@@ -9,15 +9,28 @@ struct TodayView: View {
     
     @State private var todayKey: String = ""
     @State private var showingAddHabit = false
+    @State private var showingSettings = false
+    @State private var showingDailySummary = false
     
     var body: some View {
         NavigationStack {
             List {
-                Text("Habitualist")
-                    .font(.system(size: 34, weight: .heavy, design: .rounded))
-                    .foregroundColor(.purple)
-                    .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 16))
-                    .listRowBackground(Color.clear)
+                HStack {
+                    Text("Habitualist")
+                        .font(.system(size: 34, weight: .heavy, design: .rounded))
+                        .foregroundColor(.purple)
+                    
+                    Spacer()
+                    
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .foregroundColor(.primary)
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 16))
+                .listRowBackground(Color.clear)
                 
                 if !todayKey.isEmpty {
                     Text(formatDateHeader())
@@ -25,6 +38,14 @@ struct TodayView: View {
                         .foregroundColor(.secondary)
                         .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
                 }
+                
+                Button {
+                    showingDailySummary = true
+                } label: {
+                    Text("Daily Summary")
+                        .frame(maxWidth: .infinity)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 
                 ForEach(habits) { habit in
                     HabitRowView(habit: habit, todayKey: todayKey)
@@ -42,6 +63,12 @@ struct TodayView: View {
             }
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
+            }
+            .sheet(isPresented: $showingDailySummary) {
+                DailySummaryView()
             }
             .onAppear {
                 todayKey = DayKeyService.todayKey()
@@ -69,14 +96,34 @@ struct HabitRowView: View {
         completions.contains { $0.habitId == habit.id && $0.dateKey == todayKey }
     }
     
+    private var weeklyCount: Int {
+        WeeklyProgressService.completionsThisWeek(habitId: habit.id, for: Date(), in: modelContext)
+    }
+    
+    private var isWeekCompleted: Bool {
+        WeeklyProgressService.isWeekCompleted(habit, for: Date(), in: modelContext)
+    }
+    
+    private var shouldShowGreen: Bool {
+        isWeekCompleted || isCompletedToday
+    }
+    
     var body: some View {
-        HStack(spacing: 16) {
-            HabitStatusIcon(isCompleted: isCompletedToday)
-            
-            Text(habit.title)
-                .font(.system(.body, design: .default, weight: .semibold))
-            
-            Spacer()
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(habit.title)
+                        .font(.system(.body, design: .default, weight: .semibold))
+                    
+                    Text("\(weeklyCount)/\(habit.targetDaysPerWeek) this week")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                HabitStatusIcon(isCompleted: shouldShowGreen)
+            }
         }
         .padding(.vertical, 16)
         .contentShape(Rectangle())
