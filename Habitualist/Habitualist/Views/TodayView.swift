@@ -17,7 +17,7 @@ struct TodayView: View {
             List {
                 HStack(spacing: 8) {
                     Text("Habitualist")
-                        .font(.system(size: 24, weight: .heavy, design: .rounded))
+                        .font(.custom("AcademyEngravedLetPlain", size: 34))
                         .foregroundColor(.purple)
                     
                     Spacer()
