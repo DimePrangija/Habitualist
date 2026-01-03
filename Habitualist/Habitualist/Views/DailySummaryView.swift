@@ -250,3 +250,23 @@ struct DailySummaryView: View {
         return formatter.string(from: Date())
     }
 }
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Habit.self, Completion.self, configurations: config)
+    
+    let habit1 = Habit(title: "Morning Exercise", targetDaysPerWeek: 5)
+    let habit2 = Habit(title: "Read for 30 minutes", targetDaysPerWeek: 7)
+    let habit3 = Habit(title: "Meditate", targetDaysPerWeek: 6)
+    
+    container.mainContext.insert(habit1)
+    container.mainContext.insert(habit2)
+    container.mainContext.insert(habit3)
+    
+    let todayKey = DayKeyService.todayKey()
+    let completion1 = Completion(habitId: habit1.id, dateKey: todayKey)
+    container.mainContext.insert(completion1)
+    
+    return DailySummaryView()
+        .modelContainer(container)
+}

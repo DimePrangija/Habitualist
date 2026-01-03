@@ -131,3 +131,13 @@ struct EditHabitView: View {
         dismiss()
     }
 }
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Habit.self, configurations: config)
+    let habit = Habit(title: "Exercise", targetDaysPerWeek: 5)
+    container.mainContext.insert(habit)
+    
+    return EditHabitView(habit: habit)
+        .modelContainer(container)
+}

@@ -102,3 +102,8 @@ struct AddHabitView: View {
         dismiss()
     }
 }
+
+#Preview {
+    AddHabitView()
+        .modelContainer(for: [Habit.self, Completion.self], inMemory: true)
+}

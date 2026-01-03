@@ -152,3 +152,8 @@ struct OnboardingView: View {
         try? modelContext.save()
     }
 }
+
+#Preview {
+    OnboardingView()
+        .modelContainer(for: [Habit.self, Completion.self], inMemory: true)
+}
