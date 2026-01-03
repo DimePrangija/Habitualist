@@ -46,9 +46,9 @@ struct TodayView: View {
                         .fill(ThemeColors.divider)
                         .frame(height: 1)
                     
-                    // List
+                    // Card Feed
                     ScrollView {
-                        VStack(spacing: 12) {
+                        LazyVStack(spacing: 16) {
                             Button {
                                 showingAddHabit = true
                             } label: {
@@ -86,7 +86,7 @@ struct TodayView: View {
                             .padding(.horizontal, 20)
                             
                             ForEach(habits) { habit in
-                                HabitRowView(habit: habit, todayKey: todayKey)
+                                HabitCardView(habit: habit, todayKey: todayKey)
                                     .padding(.horizontal, 20)
                             }
                         }
@@ -120,100 +120,6 @@ struct TodayView: View {
         formatter.dateFormat = "EEEE, MMMM d"
         formatter.timeZone = TimeZone.current
         return formatter.string(from: Date())
-    }
-}
-
-struct HabitRowView: View {
-    let habit: Habit
-    let todayKey: String
-    
-    @Environment(\.modelContext) private var modelContext
-    @Query private var completions: [Completion]
-    @State private var showingEditHabit = false
-    
-    private var isCompletedToday: Bool {
-        completions.contains { $0.habitId == habit.id && $0.dateKey == todayKey }
-    }
-    
-    private var weeklyCount: Int {
-        WeeklyProgressService.completionsThisWeek(habitId: habit.id, for: Date(), in: modelContext)
-    }
-    
-    private var isWeekCompleted: Bool {
-        WeeklyProgressService.isWeekCompleted(habit, for: Date(), in: modelContext)
-    }
-    
-    private var isChecked: Bool {
-        isWeekCompleted || isCompletedToday
-    }
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            // Left side: Title and progress
-            VStack(alignment: .leading, spacing: 6) {
-                Text(habit.title)
-                    .font(ThemeFonts.habitTitle())
-                    .foregroundColor(isChecked ? ThemeColors.textPrimaryOnBlue : ThemeColors.textPrimaryDarkBg)
-                
-                Text("\(weeklyCount)/\(habit.targetDaysPerWeek) this week")
-                    .font(ThemeFonts.progressMeta())
-                    .foregroundColor(isChecked ? ThemeColors.textSecondaryOnBlue : ThemeColors.textSecondaryDarkBg)
-            }
-            
-            Spacer()
-            
-            // Right side: Circular status button
-            Button {
-                toggleCompletion()
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(isChecked ? Color.black.opacity(0.22) : Color.white.opacity(0.10))
-                        .frame(width: 36, height: 36)
-                    
-                    Image(systemName: isChecked ? "checkmark" : "xmark")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.white)
-                }
-            }
-            .buttonStyle(PlainButtonStyle())
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .frame(minHeight: 78)
-        .cardStyle(
-            backgroundColor: isChecked ? ThemeColors.accentBlue : ThemeColors.cardDark,
-            borderColor: isChecked ? ThemeColors.borderBlue : ThemeColors.borderDark,
-            isChecked: isChecked
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            toggleCompletion()
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            Button {
-                showingEditHabit = true
-            } label: {
-                Label("Edit", systemImage: "pencil")
-            }
-            .tint(.blue)
-        }
-        .sheet(isPresented: $showingEditHabit) {
-            EditHabitView(habit: habit)
-        }
-    }
-    
-    private func toggleCompletion() {
-        let existingCompletion = completions.first { $0.habitId == habit.id && $0.dateKey == todayKey }
-        
-        if let completion = existingCompletion {
-            modelContext.delete(completion)
-        } else {
-            let newCompletion = Completion(habitId: habit.id, dateKey: todayKey)
-            modelContext.insert(newCompletion)
-        }
-        
-        try? modelContext.save()
     }
 }
 
