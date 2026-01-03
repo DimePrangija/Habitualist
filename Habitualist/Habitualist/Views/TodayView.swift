@@ -23,30 +23,21 @@ struct TodayView: View {
                     HStack(spacing: 0) {
                         Text("Habitualist")
                             .font(ThemeFonts.screenTitle())
-                            .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                            .foregroundColor(ThemeColors.accentBlue)
                         
                         Spacer()
                         
-                        HStack(spacing: 16) {
-                            Button {
-                                showingAddHabit = true
-                            } label: {
-                                Text("Add new habits")
-                                    .font(.system(size: 17, weight: .regular, design: .rounded))
-                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
-                            }
-                            
-                            Button {
-                                showingSettings = true
-                            } label: {
-                                Image(systemName: "gearshape")
-                                    .font(.system(size: 20, weight: .regular))
-                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
-                            }
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 20, weight: .regular))
+                                .foregroundColor(ThemeColors.textPrimaryDarkBg)
                         }
                     }
-                    .padding(.top, 16)
-                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.leading, 8)
+                    .padding(.trailing, 20)
                     .padding(.bottom, 16)
                     .background(ThemeColors.background)
                     
@@ -58,6 +49,17 @@ struct TodayView: View {
                     // List
                     ScrollView {
                         VStack(spacing: 12) {
+                            Button {
+                                showingAddHabit = true
+                            } label: {
+                                Text("Add new habits")
+                                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 16)
+                            
                             if !todayKey.isEmpty {
                                 Text(formatDateHeader())
                                     .font(ThemeFonts.progressMeta())
