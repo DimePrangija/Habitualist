@@ -17,43 +17,113 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    Picker("Appearance", selection: $appearanceMode) {
-                        ForEach(AppearanceMode.allCases, id: \.self) { mode in
-                            Text(mode.rawValue).tag(mode)
-                        }
-                    }
-                } header: {
-                    Text("Appearance")
-                }
+            ZStack {
+                ThemeColors.background
+                    .ignoresSafeArea()
                 
-                Section {
-                    Toggle("Write daily summary to Calendar", isOn: $writeDailySummaryToCalendar)
-                        .onChange(of: writeDailySummaryToCalendar) { oldValue, newValue in
-                            if newValue {
-                                Task {
-                                    await handleCalendarToggleOn()
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Appearance section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Appearance")
+                                .font(ThemeFonts.sectionLabel())
+                                .foregroundColor(ThemeColors.textSecondaryDarkBg)
+                                .textCase(.uppercase)
+                                .tracking(1.2)
+                            
+                            VStack(spacing: 0) {
+                                ForEach(Array(AppearanceMode.allCases.enumerated()), id: \.element) { index, mode in
+                                    HStack {
+                                        Text(mode.rawValue)
+                                            .font(.system(size: 17, weight: .regular, design: .rounded))
+                                            .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                        
+                                        Spacer()
+                                        
+                                        if appearanceMode == mode {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(size: 16, weight: .semibold))
+                                                .foregroundColor(ThemeColors.accentBlue)
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 14)
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        appearanceMode = mode
+                                    }
+                                    
+                                    if index < AppearanceMode.allCases.count - 1 {
+                                        Rectangle()
+                                            .fill(ThemeColors.divider)
+                                            .frame(height: 1)
+                                            .padding(.leading, 16)
+                                    }
+                                }
+                            }
+                            .cardStyle(
+                                backgroundColor: ThemeColors.cardDark,
+                                borderColor: ThemeColors.borderDark,
+                                isChecked: false
+                            )
+                        }
+                        
+                        // Calendar section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Calendar")
+                                .font(ThemeFonts.sectionLabel())
+                                .foregroundColor(ThemeColors.textSecondaryDarkBg)
+                                .textCase(.uppercase)
+                                .tracking(1.2)
+                            
+                            VStack(spacing: 12) {
+                                HStack {
+                                    Text("Write daily summary to Calendar")
+                                        .font(.system(size: 17, weight: .regular, design: .rounded))
+                                        .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                    
+                                    Spacer()
+                                    
+                                    Toggle("", isOn: $writeDailySummaryToCalendar)
+                                        .tint(ThemeColors.accentBlue)
+                                        .onChange(of: writeDailySummaryToCalendar) { oldValue, newValue in
+                                            if newValue {
+                                                Task {
+                                                    await handleCalendarToggleOn()
+                                                }
+                                            }
+                                        }
+                                }
+                                .padding(16)
+                                .cardStyle(
+                                    backgroundColor: ThemeColors.cardDark,
+                                    borderColor: ThemeColors.borderDark,
+                                    isChecked: false
+                                )
+                                
+                                if writeDailySummaryToCalendar {
+                                    Text("Daily summaries will be saved to the Habitualist calendar in Apple Calendar.")
+                                        .font(ThemeFonts.progressMeta())
+                                        .foregroundColor(ThemeColors.textSecondaryDarkBg)
+                                        .padding(.horizontal, 4)
                                 }
                             }
                         }
-                    
-                    if writeDailySummaryToCalendar {
-                        Text("Daily summaries will be saved to the Habitualist calendar in Apple Calendar.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
                     }
-                } header: {
-                    Text("Calendar")
+                    .padding(20)
                 }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(ThemeColors.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         dismiss()
                     }
+                    .foregroundColor(ThemeColors.accentBlue)
                 }
             }
             .alert("Calendar Access Required", isPresented: $showingPermissionAlert) {

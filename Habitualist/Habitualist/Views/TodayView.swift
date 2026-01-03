@@ -14,51 +14,88 @@ struct TodayView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                HStack(spacing: 8) {
-                    Text("Habitualist")
-                        .font(.custom("AcademyEngravedLetPlain", size: 34))
-                        .foregroundColor(.purple)
-                    
-                    Spacer()
-                    
-                    Button {
-                        showingAddHabit = true
-                    } label: {
-                        Text("Add new habits")
-                            .font(.body)
+            ZStack {
+                ThemeColors.background
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    HStack(spacing: 0) {
+                        Text("Habitualist")
+                            .font(ThemeFonts.screenTitle())
+                            .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 16) {
+                            Button {
+                                showingAddHabit = true
+                            } label: {
+                                Text("Add new habits")
+                                    .font(.system(size: 17, weight: .regular, design: .rounded))
+                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                            }
+                            
+                            Button {
+                                showingSettings = true
+                            } label: {
+                                Image(systemName: "gearshape")
+                                    .font(.system(size: 20, weight: .regular))
+                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                            }
+                        }
                     }
-                }
-                .listRowInsets(EdgeInsets(top: 20, leading: 16, bottom: 12, trailing: 0))
-                .listRowBackground(Color.clear)
-                
-                if !todayKey.isEmpty {
-                    Text(formatDateHeader())
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 4, trailing: 16))
-                }
-                
-                Button {
-                    showingDailySummary = true
-                } label: {
-                    Text("Daily Summary")
-                        .frame(maxWidth: .infinity)
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                
-                ForEach(habits) { habit in
-                    HabitRowView(habit: habit, todayKey: todayKey)
+                    .padding(.top, 16)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 16)
+                    .background(ThemeColors.background)
+                    
+                    // Divider
+                    Rectangle()
+                        .fill(ThemeColors.divider)
+                        .frame(height: 1)
+                    
+                    // List
+                    ScrollView {
+                        VStack(spacing: 12) {
+                            if !todayKey.isEmpty {
+                                Text(formatDateHeader())
+                                    .font(ThemeFonts.progressMeta())
+                                    .foregroundColor(ThemeColors.textSecondaryDarkBg)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 20)
+                                    .padding(.top, 16)
+                            }
+                            
+                            Button {
+                                showingDailySummary = true
+                            } label: {
+                                Text("Daily Summary")
+                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .cardStyle(
+                                        backgroundColor: ThemeColors.cardDark,
+                                        borderColor: ThemeColors.borderDark,
+                                        isChecked: false
+                                    )
+                            }
+                            .padding(.horizontal, 20)
+                            
+                            ForEach(habits) { habit in
+                                HabitRowView(habit: habit, todayKey: todayKey)
+                                    .padding(.horizontal, 20)
+                            }
+                        }
+                        .padding(.bottom, 20)
+                    }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showingSettings = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
+                ToolbarItem(placement: .principal) {
+                    Color.clear
                 }
             }
             .sheet(isPresented: $showingAddHabit) {
@@ -104,28 +141,49 @@ struct HabitRowView: View {
         WeeklyProgressService.isWeekCompleted(habit, for: Date(), in: modelContext)
     }
     
-    private var shouldShowGreen: Bool {
+    private var isChecked: Bool {
         isWeekCompleted || isCompletedToday
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(habit.title)
-                        .font(.system(.body, design: .default, weight: .semibold))
-                    
-                    Text("\(weeklyCount)/\(habit.targetDaysPerWeek) this week")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+        HStack(spacing: 16) {
+            // Left side: Title and progress
+            VStack(alignment: .leading, spacing: 6) {
+                Text(habit.title)
+                    .font(ThemeFonts.habitTitle())
+                    .foregroundColor(isChecked ? ThemeColors.textPrimaryOnBlue : ThemeColors.textPrimaryDarkBg)
                 
-                Spacer()
-                
-                HabitStatusIcon(isCompleted: shouldShowGreen)
+                Text("\(weeklyCount)/\(habit.targetDaysPerWeek) this week")
+                    .font(ThemeFonts.progressMeta())
+                    .foregroundColor(isChecked ? ThemeColors.textSecondaryOnBlue : ThemeColors.textSecondaryDarkBg)
             }
+            
+            Spacer()
+            
+            // Right side: Circular status button
+            Button {
+                toggleCompletion()
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(isChecked ? Color.black.opacity(0.22) : Color.white.opacity(0.10))
+                        .frame(width: 36, height: 36)
+                    
+                    Image(systemName: isChecked ? "checkmark" : "xmark")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.white)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
         }
-        .padding(.vertical, 16)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .frame(minHeight: 78)
+        .cardStyle(
+            backgroundColor: isChecked ? ThemeColors.accentBlue : ThemeColors.cardDark,
+            borderColor: isChecked ? ThemeColors.borderBlue : ThemeColors.borderDark,
+            isChecked: isChecked
+        )
         .contentShape(Rectangle())
         .onTapGesture {
             toggleCompletion()
@@ -157,3 +215,7 @@ struct HabitRowView: View {
     }
 }
 
+#Preview {
+    TodayView()
+        .modelContainer(for: [Habit.self, Completion.self], inMemory: true)
+}
