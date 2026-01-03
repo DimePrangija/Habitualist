@@ -35,16 +35,6 @@
 			path = Habitualist;
 			sourceTree = "<group>";
 		};
-		301867A92F0752FF00075F26 /* HabitualistTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = HabitualistTests;
-			sourceTree = "<group>";
-		};
-		301867B32F0752FF00075F26 /* HabitualistUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = HabitualistUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,8 +66,6 @@
 			isa = PBXGroup;
 			children = (
 				301867962F0752FD00075F26 /* Habitualist */,
-				301867A92F0752FF00075F26 /* HabitualistTests */,
-				301867B32F0752FF00075F26 /* HabitualistUITests */,
 				301867952F0752FD00075F26 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -130,9 +118,6 @@
 			dependencies = (
 				301867A82F0752FF00075F26 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				301867A92F0752FF00075F26 /* HabitualistTests */,
-			);
 			name = HabitualistTests;
 			packageProductDependencies = (
 			);
@@ -152,9 +137,6 @@
 			);
 			dependencies = (
 				301867B22F0752FF00075F26 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				301867B32F0752FF00075F26 /* HabitualistUITests */,
 			);
 			name = HabitualistUITests;
 			packageProductDependencies = (

@@ -10,30 +10,82 @@ struct AddHabitView: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    TextField("Habit title", text: $title)
-                        .autocorrectionDisabled()
-                }
+            ZStack {
+                ThemeColors.background
+                    .ignoresSafeArea()
                 
-                Section {
-                    Stepper("Target: \(targetDaysPerWeek) days per week", value: $targetDaysPerWeek, in: 1...7)
+                ScrollView {
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Habit title")
+                                .font(ThemeFonts.sectionLabel())
+                                .foregroundColor(ThemeColors.textSecondaryDarkBg)
+                                .textCase(.uppercase)
+                                .tracking(1.2)
+                            
+                            TextField("Enter habit title", text: $title)
+                                .font(.system(size: 17, weight: .regular, design: .rounded))
+                                .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 14)
+                                .cardStyle(
+                                    backgroundColor: ThemeColors.cardDark,
+                                    borderColor: ThemeColors.borderDark,
+                                    isChecked: false
+                                )
+                                .autocorrectionDisabled()
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Target days per week")
+                                .font(ThemeFonts.sectionLabel())
+                                .foregroundColor(ThemeColors.textSecondaryDarkBg)
+                                .textCase(.uppercase)
+                                .tracking(1.2)
+                            
+                            HStack {
+                                Text("\(targetDaysPerWeek) days per week")
+                                    .font(.system(size: 17, weight: .regular, design: .rounded))
+                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                
+                                Spacer()
+                                
+                                Stepper("", value: $targetDaysPerWeek, in: 1...7)
+                                    .labelsHidden()
+                                    .tint(ThemeColors.accentBlue)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .cardStyle(
+                                backgroundColor: ThemeColors.cardDark,
+                                borderColor: ThemeColors.borderDark,
+                                isChecked: false
+                            )
+                        }
+                    }
+                    .padding(20)
                 }
             }
             .navigationTitle("New Habit")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(ThemeColors.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         saveHabit()
                     }
+                    .foregroundColor(ThemeColors.accentBlue)
                     .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .opacity(title.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1.0)
                 }
             }
         }
@@ -51,3 +103,7 @@ struct AddHabitView: View {
     }
 }
 
+#Preview {
+    AddHabitView()
+        .modelContainer(for: [Habit.self, Completion.self], inMemory: true)
+}
