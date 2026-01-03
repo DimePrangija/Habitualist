@@ -3,6 +3,8 @@ import SwiftData
 
 struct MonthCalendarView: View {
     @Environment(\.modelContext) private var modelContext
+    @Query(filter: #Predicate<Habit> { !$0.isArchived })
+    private var habits: [Habit]
     @Query private var completions: [Completion]
     
     @State private var displayedDate: Date
@@ -56,6 +58,17 @@ struct MonthCalendarView: View {
         return Set(completions
             .filter { $0.dateKey >= startKey && $0.dateKey <= endKey }
             .map { $0.dateKey })
+    }
+    
+    private func isAllCompleted(for dateKey: String) -> Bool {
+        guard !habits.isEmpty else { return false }
+        
+        let habitIds = Set(habits.map { $0.id })
+        let completedHabitIds = Set(completions
+            .filter { $0.dateKey == dateKey }
+            .map { $0.habitId })
+        
+        return habitIds.isSubset(of: completedHabitIds)
     }
     
     init(selectedDate: Binding<Date?>) {
@@ -124,15 +137,17 @@ struct MonthCalendarView: View {
                 
                 // Day cells
                 ForEach(1...daysInMonth, id: \.self) { day in
+                    let date = calendar.date(byAdding: .day, value: day - 1, to: monthStart) ?? monthStart
+                    let dateKey = DayKeyService.dateKey(for: date)
+                    
                     DayCell(
                         day: day,
-                        date: calendar.date(byAdding: .day, value: day - 1, to: monthStart) ?? monthStart,
-                        isToday: DayKeyService.dateKey(for: calendar.date(byAdding: .day, value: day - 1, to: monthStart) ?? monthStart) == todayKey,
-                        hasCompletion: completionDateKeys.contains(DayKeyService.dateKey(for: calendar.date(byAdding: .day, value: day - 1, to: monthStart) ?? monthStart))
+                        date: date,
+                        isToday: dateKey == todayKey,
+                        hasCompletion: completionDateKeys.contains(dateKey),
+                        isAllCompleted: isAllCompleted(for: dateKey)
                     ) {
-                        if let date = calendar.date(byAdding: .day, value: day - 1, to: monthStart) {
-                            selectedDate = date
-                        }
+                        selectedDate = date
                     }
                 }
             }
@@ -152,6 +167,7 @@ struct DayCell: View {
     let date: Date
     let isToday: Bool
     let hasCompletion: Bool
+    let isAllCompleted: Bool
     let action: () -> Void
     
     var body: some View {
@@ -159,9 +175,9 @@ struct DayCell: View {
             VStack(spacing: 4) {
                 Text("\(day)")
                     .font(.system(size: 16, weight: isToday ? .semibold : .regular, design: .rounded))
-                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                    .foregroundColor(isAllCompleted ? ThemeColors.textPrimaryOnBlue : ThemeColors.textPrimaryDarkBg)
                 
-                if hasCompletion {
+                if hasCompletion && !isAllCompleted {
                     Circle()
                         .fill(ThemeColors.accentBlue)
                         .frame(width: 4, height: 4)
@@ -173,9 +189,13 @@ struct DayCell: View {
             }
             .frame(height: 44)
             .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isAllCompleted ? ThemeColors.accentBlue : Color.clear)
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(isToday ? ThemeColors.accentBlue : Color.clear, lineWidth: 2)
+                    .stroke(isToday && !isAllCompleted ? ThemeColors.accentBlue : Color.clear, lineWidth: 2)
             )
         }
         .buttonStyle(PlainButtonStyle())
