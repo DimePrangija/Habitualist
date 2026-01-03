@@ -1,6 +1,12 @@
 import SwiftUI
 import SwiftData
 
+extension Date: Identifiable {
+    public var id: TimeInterval {
+        self.timeIntervalSince1970
+    }
+}
+
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<Habit> { !$0.isArchived },
@@ -11,6 +17,8 @@ struct TodayView: View {
     @State private var showingAddHabit = false
     @State private var showingSettings = false
     @State private var showingDailySummary = false
+    @State private var isCalendarExpanded = false
+    @State private var selectedDate: Date?
     
     var body: some View {
         NavigationStack {
@@ -31,7 +39,7 @@ struct TodayView: View {
                             showingSettings = true
                         } label: {
                             Image(systemName: "gearshape")
-                                .font(.system(size: 20, weight: .regular))
+                                .font(.system(size: 30, weight: .regular))
                                 .foregroundColor(ThemeColors.textPrimaryDarkBg)
                         }
                     }
@@ -64,7 +72,7 @@ struct TodayView: View {
                                     }
                                     
                                     Text("Add new habits")
-                                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                        .font(.system(size: 20, weight: .semibold, design: .rounded))
                                         .foregroundColor(ThemeColors.textPrimaryDarkBg)
                                     
                                     Spacer()
@@ -93,7 +101,7 @@ struct TodayView: View {
                                 showingDailySummary = true
                             } label: {
                                 Text("Daily Summary")
-                                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                    .font(.system(size: 20, weight: .semibold, design: .rounded))
                                     .foregroundColor(ThemeColors.textPrimaryDarkBg)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 50)
@@ -109,12 +117,50 @@ struct TodayView: View {
                                 HabitRowView(habit: habit, todayKey: todayKey)
                                     .padding(.horizontal, 20)
                             }
+                            
+                            // Calendar section
+                            VStack(spacing: 0) {
+                                Button {
+                                    withAnimation {
+                                        isCalendarExpanded.toggle()
+                                    }
+                                } label: {
+                                    HStack {
+                                        Text("Calendar")
+                                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                            .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                        
+                                        Spacer()
+                                        
+                                        Image(systemName: isCalendarExpanded ? "chevron.up" : "chevron.down")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(ThemeColors.textSecondaryDarkBg)
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 14)
+                                    .cardStyle(
+                                        backgroundColor: ThemeColors.cardDark,
+                                        borderColor: ThemeColors.borderDark,
+                                        isChecked: false
+                                    )
+                                }
+                                .padding(.horizontal, 20)
+                                
+                                if isCalendarExpanded {
+                                    MonthCalendarView(selectedDate: $selectedDate)
+                                        .padding(.horizontal, 20)
+                                        .padding(.top, 12)
+                                }
+                            }
                         }
                         .padding(.bottom, 20)
                     }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(item: $selectedDate) { date in
+                DailySummaryByDateView(selectedDate: date)
+            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Color.clear
