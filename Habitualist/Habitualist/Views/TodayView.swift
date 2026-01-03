@@ -52,10 +52,30 @@ struct TodayView: View {
                             Button {
                                 showingAddHabit = true
                             } label: {
-                                Text("Add new habits")
-                                    .font(.system(size: 20, weight: .semibold, design: .rounded))
-                                    .foregroundColor(ThemeColors.textPrimaryDarkBg)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                HStack(spacing: 12) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(ThemeColors.accentBlue)
+                                            .frame(width: 32, height: 32)
+                                        
+                                        Image(systemName: "plus")
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundColor(ThemeColors.textPrimaryOnBlue)
+                                    }
+                                    
+                                    Text("Add new habits")
+                                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                        .foregroundColor(ThemeColors.textPrimaryDarkBg)
+                                    
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 16)
+                                .frame(height: 50)
+                                .cardStyle(
+                                    backgroundColor: ThemeColors.cardDark,
+                                    borderColor: ThemeColors.borderDark,
+                                    isChecked: false
+                                )
                             }
                             .padding(.horizontal, 20)
                             .padding(.top, 16)
