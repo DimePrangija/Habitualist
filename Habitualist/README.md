@@ -165,10 +165,5 @@ This project is available for portfolio/resume demonstration purposes.
 
 ## Author
 
-Dime Prangija
+Nikola Dimitrijevic
 
-## Acknowledgments
-
-- UI design inspired by Dribbble reference designs
-- Built with SwiftUI and SwiftData frameworks
-- Uses system fonts and native iOS design patterns
