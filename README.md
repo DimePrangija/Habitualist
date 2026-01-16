@@ -1,10 +1,11 @@
 # Habitualist
 
-A beautiful, modern habit tracking application for iPhone built with SwiftUI and SwiftData. Track your daily habits, monitor weekly progress, and view your completion history through an intuitive calendar interface.
+A modern, privacy-focused habit tracking application for iPhone. Built with SwiftUI and SwiftData, Habitualist helps you build better habits through daily tracking, weekly goal setting, and comprehensive progress visualization.
 
 ![iOS 17.0+](https://img.shields.io/badge/iOS-17.0+-blue.svg)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-5.0-orange.svg)
 ![SwiftData](https://img.shields.io/badge/SwiftData-1.0-green.svg)
+![Swift](https://img.shields.io/badge/Swift-5.9-brightgreen.svg)
 
 ## Features
 
@@ -36,10 +37,15 @@ A beautiful, modern habit tracking application for iPhone built with SwiftUI and
 
 ## Screenshots
 
-> **Note**: Add screenshots of your app here. You can add images like:
-> - `screenshots/today-view.png`
-> - `screenshots/calendar-view.png`
-> - `screenshots/daily-summary.png`
+<p align="center">
+  <img src="Habitualist/screenshots/Habit1.PNG" width="250" alt="Today View - Main Screen">
+  <img src="Habitualist/screenshots/Habit2.PNG" width="250" alt="Habit List">
+  <img src="Habitualist/screenshots/Habit3.PNG" width="250" alt="Calendar View">
+</p>
+<p align="center">
+  <img src="Habitualist/screenshots/Habit4.PNG" width="250" alt="Daily Summary">
+  <img src="Habitualist/screenshots/Habit5.PNG" width="250" alt="Settings">
+</p>
 
 ## Tech Stack
 
@@ -93,77 +99,140 @@ Habitualist/
 - Xcode 15.0 or later
 - iPhone device or simulator
 
-## Installation
+## Getting Started
 
-### Clone the Repository
+### Prerequisites
 
-```bash
-git clone https://github.com/DimePrangija/Habitualist.git
-cd Habitualist/Habitualist
-```
+- macOS 14.0 or later
+- Xcode 15.0 or later
+- iOS 17.0+ device or simulator
 
-### Open in Xcode
+### Installation
 
-1. Open `Habitualist.xcodeproj` in Xcode 15.0+
-2. Select your target device or simulator (iPhone recommended)
-3. Build and run (⌘R)
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/DimePrangija/Habitualist.git
+   cd Habitualist
+   ```
 
-### First Run
+2. **Open the project:**
+   - Open `Habitualist.xcodeproj` in Xcode 15.0 or later
+   - The Xcode project file is located at the repository root
 
-- The app will show the onboarding screen if no habits exist
-- Add your first habits and set weekly targets
-- Start tracking your daily progress!
+3. **Build and run:**
+   - Select your target device or simulator (iPhone recommended)
+   - Build and run the project (⌘R)
 
-## Usage
+### First Launch
 
-### Adding Habits
-1. Tap "Add new habits" button on the main screen
-2. Enter a habit title
-3. Set your weekly target (1-7 days)
-4. Tap Save
+On first launch, the app will guide you through the onboarding process:
+- Create your first habits with custom titles
+- Set weekly targets (1-7 days per week)
+- Begin tracking your daily progress immediately
 
-### Tracking Completion
-- Tap anywhere on a habit card to mark it complete for today
-- Completed habits turn blue with a checkmark icon
-- Weekly progress updates automatically
+All source code is located in the `Habitualist/` subfolder following standard Xcode project structure.
 
-### Viewing History
-1. Scroll to the bottom of the main screen
-2. Tap "Calendar" to expand the calendar view
-3. Navigate between months using arrow buttons
-4. Tap any date to view its detailed summary
+## Usage Guide
 
-### Settings
-- Access settings via the gear icon in the top right
-- Change appearance preferences (System/Light/Dark)
-- Enable Apple Calendar integration for daily summaries
+### Creating and Managing Habits
+
+1. **Add a new habit:**
+   - Tap the "Add new habits" button on the main screen
+   - Enter a descriptive habit title
+   - Set your weekly target (1-7 days per week)
+   - Tap "Save" to create the habit
+
+2. **Edit or archive habits:**
+   - Swipe left on any habit card to reveal the edit option
+   - Modify the title, adjust weekly targets, or archive habits
+   - Archived habits are hidden from the main view
+
+### Tracking Daily Progress
+
+- **Mark completion:** Tap anywhere on a habit card or the circular toggle button to mark it complete for today
+- **Visual feedback:** Completed habits display with a blue background and checkmark icon
+- **Progress updates:** Weekly progress counters update automatically as you complete habits
+
+### Reviewing History
+
+1. **Access calendar:**
+   - Scroll to the bottom of the main screen
+   - Tap "Calendar" to expand the interactive month view
+
+2. **Navigate and explore:**
+   - Use the left/right chevron buttons to navigate between months
+   - Dates with completions show blue dot indicators
+   - Dates with all habits completed display a blue background highlight
+
+3. **View daily summaries:**
+   - Tap any date to view its detailed summary
+   - See completion status and weekly progress for that specific date
+   - Historical data reflects the state at the time of that date
+
+### Customization
+
+- **Appearance:** Access settings via the gear icon to customize appearance preferences
+- **Calendar integration:** Optionally export daily summaries to Apple Calendar for external tracking
 
 ## Development
 
-### Code Style
-- Follow Swift API Design Guidelines
-- Use SwiftUI best practices (declarative, compositional)
-- Maintain clean separation between Models, Views, and Services
+### Architecture Overview
 
-### Adding Features
-1. Create a new branch for your feature
-2. Follow existing code patterns and architecture
-3. Update README if adding significant functionality
-4. Test thoroughly on device and simulator
+The application follows a clean, modular architecture:
 
-## Data Storage
+- **Models**: SwiftData `@Model` classes handle data persistence and relationships
+- **Services**: Business logic layer for date calculations, progress tracking, and calendar integration
+- **Views**: SwiftUI views organized by feature with clear separation of concerns
+- **Theme**: Centralized design system ensuring consistent styling across the application
 
-All data is stored locally on the device using SwiftData:
-- **Location**: Local SQLite database in app container
-- **Persistence**: Permanent (until app deletion)
-- **Privacy**: No cloud sync, no external servers
-- **Capacity**: Effectively unlimited for normal usage
+### Code Standards
+
+- Adheres to Swift API Design Guidelines
+- Implements SwiftUI best practices (declarative, compositional patterns)
+- Maintains strict separation between Models, Views, and Services
+- Uses SwiftData for reactive, type-safe data management
+
+### Contributing
+
+1. Create a feature branch from `main`
+2. Follow existing code patterns and architectural decisions
+3. Ensure all changes build and run successfully
+4. Update documentation for significant feature additions
+5. Test thoroughly on physical devices and simulators
+
+## Technical Details
+
+### Data Persistence
+
+Habitualist uses SwiftData for local data storage:
+- **Storage Location**: Local SQLite database within the app container
+- **Persistence Model**: All data persists permanently until app deletion
+- **Privacy**: No cloud synchronization or external server communication
+- **Capacity**: Effectively unlimited for typical usage patterns
+
+### Performance Considerations
+
+- Efficient date key system (YYYY-MM-DD format) enables fast queries
+- Precomputed completion sets for calendar views minimize database queries
+- Lazy loading patterns in calendar grid for optimal performance
+- Timezone-aware date handling ensures accurate tracking across time zones
+
+### Design System
+
+The application implements a comprehensive design system:
+- **Color Palette**: Dark theme (#2F2F2F background, #343434 cards, #A0CCD8 accent)
+- **Typography**: System rounded fonts with consistent sizing hierarchy
+- **Components**: Reusable card styles and standardized spacing
+- **Accessibility**: High contrast ratios and semantic color usage
 
 ## License
 
-This project is available for portfolio/resume demonstration purposes.
+This project is available for portfolio and resume demonstration purposes.
 
 ## Author
 
-Nikola Dimitrijevic
+**Nikola Dimitrijevic**
 
+---
+
+Built with ❤️ using SwiftUI and SwiftData
